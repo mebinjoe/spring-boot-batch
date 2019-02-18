@@ -1,6 +1,5 @@
 package com.example.demo.batch;
 
-import com.sun.org.apache.xerces.internal.impl.xpath.XPath;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
@@ -20,18 +19,17 @@ import org.springframework.context.annotation.Bean;
 public class SampleBatchApp {
 
 	@Autowired
-	private JobBuilderFactory jobs;
+	private JobBuilderFactory jobBuilderFactory;
 
 	@Autowired
-	private StepBuilderFactory steps;
+	private StepBuilderFactory stepBuilderFactory;
 
 	@Bean
 	protected Tasklet tasklet() {
 
 		return new Tasklet() {
 			@Override
-			public RepeatStatus execute(StepContribution contribution,
-										ChunkContext context) {
+			public RepeatStatus execute(StepContribution contribution, ChunkContext context) {
 				return RepeatStatus.FINISHED;
 			}
 		};
@@ -40,19 +38,16 @@ public class SampleBatchApp {
 
 	@Bean
 	public Job job() throws Exception {
-		return this.jobs.get("job").start(step1()).build();
+		return this.jobBuilderFactory.get("job").start(orderStep1()).build();
 	}
 
 	@Bean
-	protected Step step1() throws Exception {
-		return this.steps.get("step1").tasklet(tasklet()).build();
+	protected Step orderStep1() throws Exception {
+		return this.stepBuilderFactory.get("step1").tasklet(tasklet()).build();
 	}
 
 	public static void main(String[] args) {
-		// System.exit is common for Batch applications since the exit code can be used to
-		// drive a workflow
-		System.exit(SpringApplication
-				.exit(SpringApplication.run(SampleBatchApp.class, args)));
+		System.exit(SpringApplication.exit(SpringApplication.run(SampleBatchApp.class, args)));
 	}
 
 }
